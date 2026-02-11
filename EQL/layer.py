@@ -27,6 +27,11 @@ def mult(out, index):
 def exp(out, index):
     return tf.exp(tf.gather(out, [index], axis = 1), name = 'exp_output')
 
+def div(out, index):
+    sum1 = tf.gather(out, [index], axis=1)
+    sum2 = tf.gather(out, [index + 1], axis=1)
+    return tf.divide(sum1, sum2, name='div_output')
+
 
 class EqlLayer(keras.layers.Layer):
     def __init__(self, w_initializer, b_initializer, v, lmbda=0, mask=None, exclude=None):
@@ -38,7 +43,7 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, cos, sigmoid, mult, exp]
+        self.activations = [identity, sin, cos, sigmoid, mult, exp, div]
 
         self.exclusion = 0
         if 'id' in exclude:
@@ -59,6 +64,9 @@ class EqlLayer(keras.layers.Layer):
         if 'exp' in exclude:
             self.exclusion += 1
             self.activations.remove(exp)
+        if 'div' in exclude:
+            self.exclusion += 2
+            self.activations.remove(div)
 
     def _mask(self):
         for i in range(self.w.shape[0]):
