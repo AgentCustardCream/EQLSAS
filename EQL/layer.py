@@ -14,18 +14,10 @@ def sin(out, index):
 def cos(out, index):
     return tf.cos(tf.gather(out, [index], axis=1), name='cos_output')
 
-
-def sigmoid(out, index):
-    return tf.sigmoid(tf.gather(out, [index], axis=1), name='sig_output')
-
-
 def mult(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     sum2 = tf.gather(out, [index + 1], axis=1)
     return tf.multiply(sum1, sum2, name='mult_output')
-
-def exp(out, index):
-    return tf.exp(tf.gather(out, [index], axis = 1), name = 'exp_output')
 
 def div(out, index):
     sum1 = tf.gather(out, [index], axis=1)
@@ -43,7 +35,7 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, cos, sigmoid, mult, exp, div]
+        self.activations = [identity, sin, cos, mult, div]
 
         self.exclusion = 0
         if 'id' in exclude:
@@ -55,15 +47,9 @@ class EqlLayer(keras.layers.Layer):
         if 'cos' in exclude:
             self.exclusion += 1
             self.activations.remove(cos)
-        if 'sig' in exclude:
-            self.exclusion += 1
-            self.activations.remove(sigmoid)
         if 'mult' in exclude:
             self.exclusion += 2
             self.activations.remove(mult)
-        if 'exp' in exclude:
-            self.exclusion += 1
-            self.activations.remove(exp)
         if 'div' in exclude:
             self.exclusion += 2
             self.activations.remove(div)
