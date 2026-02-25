@@ -63,12 +63,12 @@ class EqlLayer(keras.layers.Layer):
 
     def build(self, input_shape):
         self.w = self.add_weight(
-            shape=(input_shape[-1], 7 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 6 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         self.b = self.add_weight(
-            shape=(7 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(6 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=True, regularizer=self.regularizer
         )
 
@@ -83,7 +83,7 @@ class EqlLayer(keras.layers.Layer):
         out = tf.matmul(inputs, self.w) + self.b
         output_batches = []
         for i in range(self.v):
-            v = (7 - self.exclusion) * i
+            v = (6 - self.exclusion) * i
             for a in range(len(self.activations)):
                 activation = self.activations[a](out, a + v)
                 output_batches.append(activation)
