@@ -434,6 +434,8 @@ class EQL:
                     output[activation] = output[activation][0] * output[activation][1]
                 elif 'div' in activation:
                     output[activation] = output[activation][0] / output[activation][1]
+                elif 'div0' in activation:
+                    output[activation] = output[activation][0] / output[activation][1]
                 else:
                     raise Exception(activation, 'Not a valid activation')
 
