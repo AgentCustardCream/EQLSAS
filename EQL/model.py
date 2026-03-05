@@ -430,10 +430,10 @@ class EQL:
                     output[activation] = cos(output[activation])
                 elif 'identity' in activation:
                     continue
-                elif 'sigmoid' in activation:
-                    output[activation] = Function('\sigma')(output[activation])
                 elif 'mult' in activation:
                     output[activation] = output[activation][0] * output[activation][1]
+                elif 'div' in activation:
+                    output[activation] = output[activation][0] / output[activation][1]
                 else:
                     raise Exception(activation, 'Not a valid activation')
 
