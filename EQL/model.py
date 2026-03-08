@@ -428,7 +428,7 @@ class EQL:
                                 output[f'{activation.__name__}{num_repetition}'] = layer_biases[weight_index]
                             output[f'{activation.__name__}{num_repetition}'] +=  layer_weights[weight_index] * symbol
                         weight_index += 1
-                    
+            print(output.keys())
             for activation in output.keys():
                 if 'sin' in activation:
                     output[activation] = sin(output[activation])
