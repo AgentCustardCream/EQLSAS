@@ -417,6 +417,18 @@ class EQL:
                             output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
                             output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
                             weight_index += 1 # Skip over second mult node
+                        if activation.__name__ == 'div':
+                            if dim == 0:
+                                output[f'{activation.__name__}{num_repetition}'] = [layer_biases[weight_index], layer_biases[weight_index+1]]
+                            output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
+                            output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
+                            weight_index += 1 # Skip over second div node
+                        if activation.__name__ == 'div0':
+                            if dim == 0:
+                                output[f'{activation.__name__}{num_repetition}'] = [layer_biases[weight_index], layer_biases[weight_index+1]]
+                            output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
+                            output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
+                            weight_index += 1 # Skip over second div node
                         else:
                             if dim == 0:
                                 output[f'{activation.__name__}{num_repetition}'] = layer_biases[weight_index]
