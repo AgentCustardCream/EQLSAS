@@ -34,7 +34,7 @@ def sphere(out, index):
     
 def lorentz(out, index):
     sum1 = tf.gather(out, [index], axis=1)
-    denom = tf.add((tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))))
+    denom = tf.add(tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32)))
     return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom, name = 'lorentz_output')
 
 
