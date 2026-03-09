@@ -35,7 +35,7 @@ def sphere(out, index):
 def lorentz(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     denom = tf.add((tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))))
-    return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom)
+    return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom, name = 'lorentz_output')
 
 
 class EqlLayer(keras.layers.Layer):
@@ -48,7 +48,7 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, div, cos, mult, sphere]
+        self.activations = [identity, sin, div, cos, mult, sphere, lorentz]
 
         self.exclusion = 0
         if 'id' in exclude:
