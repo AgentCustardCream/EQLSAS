@@ -27,12 +27,15 @@ def sphere(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     sin = tf.sin(sum1)
     cos = tf.multiply(sum1, tf.cos(sum1))
-    numerator = tf.subtract(sin,cos)
+    numerator = tf.add(sin,cos)
     denom = tf.pow(sum1, tf.convert_to_tensor(3, dtype = tf.float32))
     frac = tf.divide(numerator, denom)
     return tf.pow(frac, tf.convert_to_tensor(2, dtype = tf.float32), name = 'sphere_output')
     
-
+def lorentz(out, index):
+    sum1 = tf.gather(out, [index], axis=1)
+    denom = tf.add((tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))))
+    return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom)
 
 
 class EqlLayer(keras.layers.Layer):
@@ -66,6 +69,9 @@ class EqlLayer(keras.layers.Layer):
         if 'sphere' in exclude:
             self.exclusion += 1
             self.activations.remove(sphere)
+        if 'lorentz' in exclude:
+            self.exclusion += 1
+            self.activations.remove(lorentz)
 
     def _mask(self):
         for i in range(self.w.shape[0]):
@@ -76,12 +82,12 @@ class EqlLayer(keras.layers.Layer):
 
     def build(self, input_shape):
         self.w = self.add_weight(
-            shape=(input_shape[-1], 7 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 8 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         self.b = self.add_weight(
-            shape=(7 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(8 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=True, regularizer=self.regularizer
         )
 
@@ -96,7 +102,7 @@ class EqlLayer(keras.layers.Layer):
         out = tf.matmul(inputs, self.w) + self.b
         output_batches = []
         for i in range(self.v):
-            v = (7 - self.exclusion) * i
+            v = (8 - self.exclusion) * i
             for a in range(len(self.activations)):
                 activation = self.activations[a](out, a + v)
                 output_batches.append(activation)
