@@ -16,7 +16,7 @@ def cos(out, index):
     
 def div(out, index):
     sum1 = tf.gather(out, [index], axis=1)
-    return tf.divide(1, sum1, name='div_output')
+    return tf.divide(tf.convert_to_tensor(1, dtype=tf.float32), sum1, name='div_output')
     
 def mult(out, index):
     sum1 = tf.gather(out, [index], axis=1)
