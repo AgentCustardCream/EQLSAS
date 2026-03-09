@@ -438,6 +438,9 @@ class EQL:
                 elif 'sphere' in activation:
                     s = Function("Sphere")
                     output[activation] = s(output[activation])
+                elif 'lorentz' in activation:
+                    l = Function("Lorentz")
+                    output[activation] = l(output[activation])
                 else:
                     raise Exception(activation, 'Not a valid activation')
 
