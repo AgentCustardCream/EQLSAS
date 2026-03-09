@@ -13,16 +13,16 @@ def sin(out, index):
 
 def cos(out, index):
     return tf.cos(tf.gather(out, [index], axis=1), name='cos_output')
-
+    
+def div(out, index):
+    sum1 = tf.gather(out, [index], axis=1)
+    return tf.divide(1, sum1, name='div_output')
+    
 def mult(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     sum2 = tf.gather(out, [index + 1], axis=1)
     return tf.multiply(sum1, sum2, name='mult_output')
 
-def div(out, index):
-    sum1 = tf.gather(out, [index], axis=1)
-    sum2 = tf.gather(out, [index + 1], axis=1)
-    return tf.divide(sum1, sum2, name='div_output')
 
 
 class EqlLayer(keras.layers.Layer):
@@ -35,7 +35,7 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, cos, mult, div]
+        self.activations = [identity, sin, div, cos, mult]
 
         self.exclusion = 0
         if 'id' in exclude:
@@ -51,7 +51,7 @@ class EqlLayer(keras.layers.Layer):
             self.exclusion += 2
             self.activations.remove(mult)
         if 'div' in exclude:
-            self.exclusion += 2
+            self.exclusion += 1
             self.activations.remove(div)
 
     def _mask(self):
@@ -63,12 +63,12 @@ class EqlLayer(keras.layers.Layer):
 
     def build(self, input_shape):
         self.w = self.add_weight(
-            shape=(input_shape[-1], 7 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 6 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         self.b = self.add_weight(
-            shape=(7 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(6 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=True, regularizer=self.regularizer
         )
 
@@ -83,7 +83,7 @@ class EqlLayer(keras.layers.Layer):
         out = tf.matmul(inputs, self.w) + self.b
         output_batches = []
         for i in range(self.v):
-            v = (7 - self.exclusion) * i
+            v = (6 - self.exclusion) * i
             for a in range(len(self.activations)):
                 activation = self.activations[a](out, a + v)
                 output_batches.append(activation)
