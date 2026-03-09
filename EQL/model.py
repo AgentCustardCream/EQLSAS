@@ -435,6 +435,9 @@ class EQL:
                     output[activation] = output[activation][0] * output[activation][1]
                 elif 'div' in activation:
                     output[activation] = 1 / output[activation]
+                elif 'sphere' in activation:
+                    s = Function("Sphere")
+                    output[activation] = s(output[activation])
                 else:
                     raise Exception(activation, 'Not a valid activation')
 
