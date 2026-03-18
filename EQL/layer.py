@@ -107,7 +107,8 @@ class EqlLayer(keras.layers.Layer):
         for i in range(self.v):
             v = (8 - self.exclusion) * i
             for a in range(len(self.activations)):
-                if activation == 'sphere':
+                act = self.activations[a]
+                if act == 'sphere':
                     activation = self.activations[a](out - self.b, a + v)
                 else:
                     activation = self.activations[a](out, a + v)
