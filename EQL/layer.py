@@ -107,7 +107,10 @@ class EqlLayer(keras.layers.Layer):
         for i in range(self.v):
             v = (8 - self.exclusion) * i
             for a in range(len(self.activations)):
-                activation = self.activations[a](out, a + v)
+                if activation == 'sphere':
+                    activation = self.activations[a](out - self.b, a + v)
+                else:
+                    activation = self.activations[a](out, a + v)
                 output_batches.append(activation)
         output = tf.concat(output_batches, axis=1)
         return output
