@@ -1,4 +1,5 @@
 import tensorflow as tf
+import math
 from tensorflow import keras
 from tensorflow.keras import regularizers, initializers
 
@@ -39,8 +40,17 @@ def lorentz(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     denom = tf.add(tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32)))
     return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom, name = 'lorentz_output')
-
-
+def oz(out, index):
+    sum1 = tf.gather(out, [index], axis=1)
+    denom = tf.add(tf.convert_to_tensor(1, dtype = tf.float32), tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32)))
+    return tf.divide(tf.convert_to_tensor(1, dtype = tf.float32), denom, name = 'oz_output')
+def ts(out, index):
+    sum1 = tf.gather(out, [index], axis=1)
+    sum2 = tf.gather(out, [index+1], axis=1)
+    num = tf.convert_to_tensor(8* (math.pi), dtype = tf.float32)
+    term2 = tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))
+    term3 = tf.pow(sum2, tf.convert_to_tensor(4, dtype = tf.float32))
+    return tf.divide(num, denom, name = 'ts_output')
 class EqlLayer(keras.layers.Layer):
     def __init__(self, w_initializer, b_initializer, v, lmbda=0, mask=None, exclude=None):
         super(EqlLayer, self).__init__()
@@ -51,7 +61,7 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, div, cos, mult, sphere, lorentz]
+        self.activations = [identity, sin, div, cos, mult, sphere, lorentz, oz, ts]
 
         self.exclusion = 0
         if 'id' in exclude:
@@ -75,6 +85,12 @@ class EqlLayer(keras.layers.Layer):
         if 'lorentz' in exclude:
             self.exclusion += 1
             self.activations.remove(lorentz)
+        if 'oz' in exclude:
+            self.exclusion += 1
+            self.activations.remove(oz)
+        if 'ts' in exclude:
+            self.exclusion += 1
+            self.activations.remove(ts)
 
     def _mask(self):
         for i in range(self.w.shape[0]):
@@ -85,12 +101,12 @@ class EqlLayer(keras.layers.Layer):
 
     def build(self, input_shape):
         self.w = self.add_weight(
-            shape=(input_shape[-1], 8 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 10 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         self.b = self.add_weight(
-            shape=(8 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(10 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=True, regularizer=self.regularizer
         )
 
@@ -105,10 +121,10 @@ class EqlLayer(keras.layers.Layer):
         out = tf.matmul(inputs, self.w) + self.b
         output_batches = []
         for i in range(self.v):
-            v = (8 - self.exclusion) * i
+            v = (10 - self.exclusion) * i
             for a in range(len(self.activations)):
                 act = self.activations[a]
-                if act == 'sphere':
+                if act == 'sphere' or act == 'oz':
                     activation = self.activations[a](out - self.b, a + v)
                 else:
                     activation = self.activations[a](out, a + v)
