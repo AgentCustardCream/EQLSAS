@@ -447,7 +447,7 @@ class EQL:
                 elif 'lorentz' in activation:
                     l = Function("Lorentz")
                     output[activation] = l(output[activation])
-                elif 'os' in activation:
+                elif 'oz' in activation:
                     o = Function("Ornstein-Zernicke")
                     output[activation] = o(output[activation])
                 elif 'ts' in activation:
