@@ -48,8 +48,9 @@ def ts(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     sum2 = tf.gather(out, [index+1], axis=1)
     num = tf.convert_to_tensor(8* (math.pi), dtype = tf.float32)
-    term2 = tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))
-    term3 = tf.pow(sum2, tf.convert_to_tensor(4, dtype = tf.float32))
+    term1 = tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))
+    term2 = tf.pow(sum2, tf.convert_to_tensor(2, dtype = tf.float32))
+    denom = tf.add(term1, term2)
     return tf.divide(num, denom, name = 'ts_output')
 class EqlLayer(keras.layers.Layer):
     def __init__(self, w_initializer, b_initializer, v, lmbda=0, mask=None, exclude=None):
@@ -89,7 +90,7 @@ class EqlLayer(keras.layers.Layer):
             self.exclusion += 1
             self.activations.remove(oz)
         if 'ts' in exclude:
-            self.exclusion += 1
+            self.exclusion += 2
             self.activations.remove(ts)
 
     def _mask(self):
@@ -101,12 +102,12 @@ class EqlLayer(keras.layers.Layer):
 
     def build(self, input_shape):
         self.w = self.add_weight(
-            shape=(input_shape[-1], 10 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 11 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         self.b = self.add_weight(
-            shape=(10 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(11 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=True, regularizer=self.regularizer
         )
 
@@ -118,15 +119,20 @@ class EqlLayer(keras.layers.Layer):
             b_mask = tf.matmul([self.b], self.mask[1])[0]
             self.b.assign(b_mask)
 
-        out = tf.matmul(inputs, self.w) + self.b
+        
         output_batches = []
         for i in range(self.v):
-            v = (10 - self.exclusion) * i
+            v = (11 - self.exclusion) * i
             for a in range(len(self.activations)):
                 act = self.activations[a]
                 if act == 'sphere' or act == 'oz':
-                    activation = self.activations[a](out - self.b, a + v)
+                    out = tf.matmul(inputs, self.w)
+                    activation = self.activations[a](out, a + v)
+                if act == 'ts':
+                    new_inputs = tf.matmul(inputs, inputs)
+                    out = tf.matmul(new_inputs, self.w) + self.b
                 else:
+                    out = tf.matmul(inputs, self.w) + self.b
                     activation = self.activations[a](out, a + v)
                 output_batches.append(activation)
         output = tf.concat(output_batches, axis=1)
