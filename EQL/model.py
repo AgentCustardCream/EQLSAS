@@ -417,6 +417,12 @@ class EQL:
                             output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
                             output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
                             weight_index += 1 # Skip over second mult node
+                        if activation.__name__ == 'ts':
+                            if dim == 0:
+                                output[f'{activation.__name__}{num_repetition}'] = [layer_biases[weight_index], layer_biases[weight_index+1]]
+                            output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
+                            output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
+                            weight_index += 1 # Skip over second mult node
                         else:
                             if dim == 0:
                                 output[f'{activation.__name__}{num_repetition}'] = layer_biases[weight_index]
@@ -441,6 +447,15 @@ class EQL:
                 elif 'lorentz' in activation:
                     l = Function("Lorentz")
                     output[activation] = l(output[activation])
+                elif 'os' in activation:
+                    o = Function("Ornstein-Zernicke")
+                    output[activation] = o(output[activation])
+                elif 'ts' in activation:
+                    tA = Function("Taubner-StreyA")
+                    tB = Function("Taubner-StreyB")
+                    outA = tA(output[activation][0])
+                    outB = tB(output[activation][1])
+                    output[activation] = outA + outB
                 else:
                     raise Exception(activation, 'Not a valid activation')
 
