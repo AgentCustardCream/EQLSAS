@@ -125,15 +125,14 @@ class EqlLayer(keras.layers.Layer):
             v = (11 - self.exclusion) * i
             for a in range(len(self.activations)):
                 act = str(self.activations[a])
-                print(act)
                 check1 = act.find("sphere")
                 check2 = act.find("oz")
                 check3 = act.find("ts")
-                print(check1)
-                print(check2)
-                print(check3)
                 
-                if check1 != -1 or check2 != -1:
+                if check1 != -1:
+                    out = tf.matmul(inputs, self.w)
+                    activation = self.activations[a](out, a + v)
+                if check2 != -1:
                     out = tf.matmul(inputs, self.w)
                     activation = self.activations[a](out, a + v)
                 if check3 != -1:
