@@ -125,6 +125,7 @@ class EqlLayer(keras.layers.Layer):
             for a in range(len(self.activations)):
                 act = self.activations[a]
                 print(act)
+                print(type(act))
                 if act == 'sphere0' or act == 'oz0':
                     out = tf.matmul(inputs, self.w)
                     activation = self.activations[a](out, a + v)
