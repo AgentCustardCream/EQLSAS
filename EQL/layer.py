@@ -31,7 +31,7 @@ def sphere(out, index):
     numerator = tf.add(sin,cos)
     numerator = tf.multiply(numerator, tf.convert_to_tensor(3, dtype = tf.float32))
     sum1fix = tf.add(sum1, tf.convert_to_tensor(0.1, dtype = tf.float32)
-    denom = tf.pow(sum1, tf.convert_to_tensor(3, dtype = tf.float32))
+    denom = tf.pow(sum1fix, tf.convert_to_tensor(3, dtype = tf.float32))
     frac = tf.divide(numerator, denom)
     
     return tf.pow(frac, tf.convert_to_tensor(2, dtype = tf.float32), name = 'sphere_output')
@@ -125,14 +125,16 @@ class EqlLayer(keras.layers.Layer):
             v = (11 - self.exclusion) * i
             for a in range(len(self.activations)):
                 act = str(self.activations[a])
+                print(act)
                 check1 = act.find("sphere")
                 check2 = act.find("oz")
                 check3 = act.find("ts")
+                print(check1,check2,check3)
                 if check1 != -1 or check2 != -1:
                     out = tf.matmul(inputs, self.w)
                     activation = self.activations[a](out, a + v)
                 if check3 != -1:
-                    new_inputs = tf.matmul(inputs, inputs)
+                    new_inputs = tf.pow(inputs, tf.convert_to_tensor(2, dtype = tf.float32))
                     out = tf.matmul(new_inputs, self.w) + self.b
                     activation = self.activations[a](out, a + v)
                 else:
