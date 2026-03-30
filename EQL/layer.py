@@ -130,6 +130,7 @@ class EqlLayer(keras.layers.Layer):
                 if act == 'ts':
                     new_inputs = tf.matmul(inputs, inputs)
                     out = tf.matmul(new_inputs, self.w) + self.b
+                    activation = self.activations[a](out, a + v)
                 else:
                     out = tf.matmul(inputs, self.w) + self.b
                     activation = self.activations[a](out, a + v)
