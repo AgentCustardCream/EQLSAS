@@ -128,9 +128,11 @@ class EqlLayer(keras.layers.Layer):
                 check2 = act.find("oz")
                 check3 = act.find("ts")
                 if check1 != -1:
+                    print("This is a sphere")
                     out = tf.matmul(inputs, (self.w + self.b))
                     activation = self.activations[a](out, a + v)
                 if check2 != -1:
+                    print("This is a oz")
                     out = tf.matmul(inputs, (self.w + self.b))
                     activation = self.activations[a](out, a + v)
                 if check3 != -1:
