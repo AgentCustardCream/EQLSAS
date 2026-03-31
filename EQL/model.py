@@ -128,6 +128,7 @@ class EQL:
 
         inputs = tf.keras.Input(shape=(self.dim,))
         x = inputs
+        
         for i in range(self.num_layers):
             x = EqlLayer(w_initializer=w_init, b_initializer=b_init, v=self.v[i], exclude=self.exclude[i])(x)
         out_layer = DenseLayer(w_initializer=w_init, b_initializer=b_init)
@@ -278,6 +279,12 @@ class EQL:
         """
         self.atol = atol
         assert self.model is not None, 'Must call build_and_compile method model before training'
+        weights = []
+        biases = []
+        for i in range(1, self.num_layers + 2):  # Plus 2 here because range goes from 1 -> n - 1, need n + 1
+            weights.append(self.get_weights(i)[0])
+            biases.append(self.get_weights(i)[1])
+        self.__rebuild(weights, biases, l0 = True)
         if verbose != 0:
             print('Beginning Training, T0_epochs = ' + str(t0))
         self.model.fit(x, y, batch_size, t0, verbose, callbacks,
