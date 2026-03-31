@@ -107,7 +107,7 @@ class EqlLayer(keras.layers.Layer):
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
-        if self.b_initializer == 'zeroes':
+        if self.b_initializer == 'zeros':
             isZeroes = False
         self.b = self.add_weight(
             shape=(11 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
