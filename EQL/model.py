@@ -140,7 +140,7 @@ class EQL:
                       weighted_metrics=self.weighted_metrics, run_eagerly=self.run_eagerly)
         self.model = model
 
-    def __rebuild(self, weights, biases, lmbda, l0=False):
+    def __rebuild(self, weights, biases, lmbda=0, l0=False):
         """
         :param weights: Weights from previous training
         :type weights: list
