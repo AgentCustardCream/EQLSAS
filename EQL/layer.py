@@ -30,8 +30,7 @@ def sphere(out, index):
     cos = tf.multiply(sum1, tf.cos(sum1))
     numerator = tf.add(sin,cos)
     numerator = tf.multiply(numerator, tf.convert_to_tensor(3, dtype = tf.float32))
-    sum1fix = tf.add(sum1, tf.convert_to_tensor(0.1, dtype = tf.float32))
-    denom = tf.pow(sum1fix, tf.convert_to_tensor(3, dtype = tf.float32))
+    denom = tf.pow(sum1, tf.convert_to_tensor(3, dtype = tf.float32))
     frac = tf.divide(numerator, denom)
     
     return tf.pow(frac, tf.convert_to_tensor(2, dtype = tf.float32), name = 'sphere_output')
