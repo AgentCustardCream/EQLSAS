@@ -101,14 +101,17 @@ class EqlLayer(keras.layers.Layer):
         self.b.assign(b_mask)
 
     def build(self, input_shape):
+        isZeroes = True
         self.w = self.add_weight(
             shape=(input_shape[-1], 11 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
+        if self.b_initializer == 'zeroes':
+            isZeroes = False
         self.b = self.add_weight(
             shape=(11 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
-            trainable=True, regularizer=self.regularizer
+            trainable=isZeroes, regularizer=self.regularizer
         )
 
     def call(self, inputs):
