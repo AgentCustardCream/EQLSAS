@@ -129,11 +129,11 @@ class EqlLayer(keras.layers.Layer):
                 check2 = act.find("oz")
                 check3 = act.find("ts")
                 if check1 != -1:
-                    out = tf.matmul(inputs, self.w) + (self.b * [0])
+                    out = tf.matmul(inputs, self.w)
                     activation = self.activations[a](out, a + v)
                 if check2 != -1:
  
-                    out = tf.matmul(inputs, self.w) + (self.b * [0])
+                    out = tf.matmul(inputs, self.w)
                     activation = self.activations[a](out, a + v)
                 if check3 != -1:
                     new_inputs = tf.pow(inputs, tf.convert_to_tensor(2, dtype = tf.float32))
