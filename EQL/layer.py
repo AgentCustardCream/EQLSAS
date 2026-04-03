@@ -51,7 +51,7 @@ def ts(out, index):
 
     term1 = tf.pow(sum1, tf.convert_to_tensor(2, dtype = tf.float32))
     term2 = tf.pow(sum2, tf.convert_to_tensor(2, dtype = tf.float32))
-    denom = tf.add(sum1, sum2)
+    denom = tf.add(term1, term2)
     return tf.divide(num, denom, name = 'ts_output')
 class EqlLayer(keras.layers.Layer):
     def __init__(self, w_initializer, b_initializer, v, lmbda=0, mask=None, exclude=None):
