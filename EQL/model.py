@@ -418,12 +418,6 @@ class EQL:
                 # Looping through number of nodes in next layer, v * activations
                 for num_repetition in range(self.v[layer-1]):
                     for activation in self.model.layers[layer].activations:
-                        if activation.__name__ == 'mult':
-                            if dim == 0:
-                                output[f'{activation.__name__}{num_repetition}'] = [layer_biases[weight_index], layer_biases[weight_index+1]]
-                            output[f'{activation.__name__}{num_repetition}'][0] += layer_weights[weight_index] * symbol
-                            output[f'{activation.__name__}{num_repetition}'][1] += layer_weights[weight_index+1] * symbol
-                            weight_index += 1 # Skip over second mult node
                         if activation.__name__ == 'ts':
                             if dim == 0:
                                 output[f'{activation.__name__}{num_repetition}'] = [layer_biases[weight_index], layer_biases[weight_index+1]]
@@ -438,17 +432,7 @@ class EQL:
             print(output)
             print(output.keys())
             for activation in output.keys():
-                if 'sin' in activation:
-                    output[activation] = sin(output[activation])
-                elif 'cos' in activation:
-                    output[activation] = cos(output[activation])
-                elif 'identity' in activation:
-                    continue
-                elif 'mult' in activation:
-                    output[activation] = output[activation][0] * output[activation][1]
-                elif 'div' in activation:
-                    output[activation] = 1 / output[activation]
-                elif 'sphere' in activation:
+                if 'sphere' in activation:
                     s = Function("Sphere")
                     output[activation] = s(output[activation])
                 elif 'lorentz' in activation:
