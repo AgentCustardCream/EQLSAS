@@ -3,27 +3,6 @@ import math
 from tensorflow import keras
 from tensorflow.keras import regularizers, initializers
 
-
-def identity(out, index):
-    return tf.identity(tf.gather(out, [index], axis=1), name='identity_output')
-
-
-def sin(out, index):
-    return tf.sin(tf.gather(out, [index], axis=1), name='sin_output')
-
-
-def cos(out, index):
-    return tf.cos(tf.gather(out, [index], axis=1), name='cos_output')
-    
-def div(out, index):
-    sum1 = tf.gather(out, [index], axis=1)
-    return tf.divide(tf.convert_to_tensor(1, dtype=tf.float32), sum1, name='div_output')
-    
-def mult(out, index):
-    sum1 = tf.gather(out, [index], axis=1)
-    sum2 = tf.gather(out, [index + 1], axis=1)
-    return tf.multiply(sum1, sum2, name='mult_output')
-
 def sphere(out, index):
     sum1 = tf.gather(out, [index], axis=1)
     sin = tf.sin(sum1)
@@ -63,24 +42,9 @@ class EqlLayer(keras.layers.Layer):
         self.b_initializer = initializers.get(b_initializer)
         self.mask = mask
         self.v = v
-        self.activations = [identity, sin, div, cos, mult, sphere, lorentz, oz, ts]
+        self.activations = [sphere, lorentz, oz, ts]
 
         self.exclusion = 0
-        if 'id' in exclude:
-            self.exclusion += 1
-            self.activations.remove(identity)
-        if 'sin' in exclude:
-            self.exclusion += 1
-            self.activations.remove(sin)
-        if 'cos' in exclude:
-            self.exclusion += 1
-            self.activations.remove(cos)
-        if 'mult' in exclude:
-            self.exclusion += 2
-            self.activations.remove(mult)
-        if 'div' in exclude:
-            self.exclusion += 1
-            self.activations.remove(div)
         if 'sphere' in exclude:
             self.exclusion += 1
             self.activations.remove(sphere)
@@ -104,14 +68,14 @@ class EqlLayer(keras.layers.Layer):
     def build(self, input_shape):
         isZeroes = True
         self.w = self.add_weight(
-            shape=(input_shape[-1], 11 * self.v - self.v * self.exclusion),
+            shape=(input_shape[-1], 5 * self.v - self.v * self.exclusion),
             initializer=self.w_initializer,
             trainable=True, regularizer=self.regularizer
         )
         if self.b_initializer == 'zeros':
             isZeroes = False
         self.b = self.add_weight(
-            shape=(11 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
+            shape=(5 * self.v - self.v * self.exclusion,), initializer=self.b_initializer,
             trainable=isZeroes, regularizer=self.regularizer
         )
 
@@ -126,7 +90,7 @@ class EqlLayer(keras.layers.Layer):
         
         output_batches = []
         for i in range(self.v):
-            v = (11 - self.exclusion) * i
+            v = (5 - self.exclusion) * i
             for a in range(len(self.activations)):
                 act = str(self.activations[a])
 
